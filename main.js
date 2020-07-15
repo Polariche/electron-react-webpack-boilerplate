@@ -132,3 +132,14 @@ app.on('ready', () => {
   request.end()
 })
 
+app.on('ready', () => {
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.send('ping', 'hello world1')
+  })
+})
+
+app.on('ready', () => {
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.send('ping', 'hello world2')
+  })
+})
