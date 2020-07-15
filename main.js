@@ -105,30 +105,31 @@ app.on('activate', () => {
 })
 
 
-app.on('ready', () => {
-  const { net } = require('electron')
-  const request = net.request({
-                    method: 'GET',
-                    protocol: '',
-                    hostname: '203.237.53.82',
-                    port: 8090,
-                    path: '/ping'
-                  })
-  request.on('response', (response) => {
-    console.log(`STATUS: ${response.statusCode}`)
-    console.log(`HEADERS: ${JSON.stringify(response.headers)}`)
-    response.on('data', (chunk) => {
-      console.log(`BODY: ${chunk}`)
+// app.on('ready', () => {
+//   const { net } = require('electron')
+//   const request = net.request({
+//                     method: 'GET',
+//                     protocol: '',
+//                     hostname: '203.237.53.82',
+//                     port: 8092,
+//                     path: '/ping'
+//                   })
 
-      // https://github.com/electron/electron/issues/3386
-      win.webContents.on('did-finish-load', () => {
-        win.webContents.send('ping', `${chunk}`)
-      })
-    })
-    response.on('end', () => {
-      console.log('No more data in response.')
-    })
-  })
-  request.end()
-})
+//   request.on('response', (response) => {
+//     console.log(`STATUS: ${response.statusCode}`)
+//     console.log(`HEADERS: ${JSON.stringify(response.headers)}`)
+//     response.on('data', (chunk) => {
+//       console.log(`BODY: ${chunk}`)
+
+//       // https://github.com/electron/electron/issues/3386
+//       win.webContents.on('did-finish-load', () => {
+//         win.webContents.send('ping', `${chunk}`)
+//       })
+//     })
+//     response.on('end', () => {
+//       console.log('No more data in response.')
+//     })
+//   })
+//   request.end()
+// })
 

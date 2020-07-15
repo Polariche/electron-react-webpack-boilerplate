@@ -7,6 +7,12 @@ const { spawn } = require('child_process')
 const defaultInclude = path.resolve(__dirname, 'src')
 
 module.exports = {
+  // output: {
+  //   filename: 'bundle.js',
+  //   path: path.resolve(__dirname, './dist'),
+  //   publicPath: 'dist/',
+  // },
+  // mode: 'none',
   module: {
     rules: [
       {
@@ -16,7 +22,15 @@ module.exports = {
       },
       {
         test: /\.jsx?$/,
-        use: [{ loader: 'babel-loader' }],
+        use: [{ 
+          loader: 'babel-loader',
+          options: {
+            plugins: [
+              "@babel/plugin-proposal-class-properties"
+            ]
+          } 
+        
+        }],
         include: defaultInclude
       },
       {
