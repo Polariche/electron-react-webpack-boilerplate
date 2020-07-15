@@ -1,13 +1,13 @@
 'use strict'
 
 // Import parts of electron to use
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let win
 
 // Keep a reference for dev mode
 let dev = false
@@ -30,7 +30,7 @@ if (process.platform === 'win32') {
 
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({
+  win = new BrowserWindow({
     width: 1024,
     height: 768,
     show: false,
@@ -57,11 +57,11 @@ function createWindow() {
     })
   }
 
-  mainWindow.loadURL(indexPath)
+  win.loadURL(indexPath)
 
   // Don't show until we are ready and loaded
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show()
+  win.once('ready-to-show', () => {
+    win.show()
 
     // Open the DevTools automatically if developing
     if (dev) {
@@ -69,16 +69,16 @@ function createWindow() {
 
       installExtension(REACT_DEVELOPER_TOOLS)
         .catch(err => console.log('Error loading React DevTools: ', err))
-      mainWindow.webContents.openDevTools()
+      win.webContents.openDevTools()
     }
   })
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
+  win.on('closed', function() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    mainWindow = null
+    win = null
   })
 }
 
@@ -99,10 +99,11 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
+  if (win === null) {
     createWindow()
   }
 })
+
 
 app.on('ready', () => {
   const { net } = require('electron')
@@ -118,10 +119,32 @@ app.on('ready', () => {
     console.log(`HEADERS: ${JSON.stringify(response.headers)}`)
     response.on('data', (chunk) => {
       console.log(`BODY: ${chunk}`)
+
+      // https://github.com/electron/electron/issues/3386
+      win.webContents.on('did-finish-load', () => {
+        win.webContents.send('ping', `${chunk}`)
+      })
     })
     response.on('end', () => {
       console.log('No more data in response.')
     })
   })
   request.end()
+})
+
+// https://www.electronjs.org/docs/api/ipc-main
+app.on('ready', () => {
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.send('ping', 'hello world!')
+  })
+})
+
+ipcMain.on('asynchronous-message', (event, arg) => {
+  console.log(arg) // "ping" 출력
+  event.reply('asynchronous-reply', 'pong')
+})
+
+ipcMain.on('synchronous-message', (event, arg) => {
+  console.log(arg) // "ping" 출력
+  event.returnValue = 'pong'
 })
