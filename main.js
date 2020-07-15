@@ -132,19 +132,3 @@ app.on('ready', () => {
   request.end()
 })
 
-// https://www.electronjs.org/docs/api/ipc-main
-app.on('ready', () => {
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('ping', 'hello world!')
-  })
-})
-
-ipcMain.on('asynchronous-message', (event, arg) => {
-  console.log(arg) // "ping" 출력
-  event.reply('asynchronous-reply', 'pong')
-})
-
-ipcMain.on('synchronous-message', (event, arg) => {
-  console.log(arg) // "ping" 출력
-  event.returnValue = 'pong'
-})
