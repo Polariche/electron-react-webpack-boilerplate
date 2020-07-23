@@ -47,6 +47,8 @@
     "electron": "electron ."
   },
   "dependencies": {
+    "face-api.js": "^0.22.2",
+    "json-loader": "^0.5.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1"
   },

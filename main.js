@@ -8,6 +8,7 @@ const url = require('url')
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+let win2
 
 // Keep a reference for dev mode
 let dev = false
@@ -82,10 +83,64 @@ function createWindow() {
   })
 }
 
+function createWorker() {
+  // Create the browser window.
+  win2 = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    show: false,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  })
+
+  // and load the index.html of the app.
+  let indexPath
+
+  if (dev && process.argv.indexOf('--noDevServer') === -1) {
+    indexPath = url.format({
+      protocol: 'http:',
+      host: 'localhost:8080',
+      pathname: 'worker.html',
+      slashes: true
+    })
+  } else {
+    indexPath = url.format({
+      protocol: 'file:',
+      pathname: path.join(__dirname, 'dist', 'worker.html'),
+      slashes: true
+    })
+  }
+
+  win2.loadURL(indexPath)
+
+  // Don't show until we are ready and loaded
+  win2.once('ready-to-show', () => {
+    win2.show()
+
+    // Open the DevTools automatically if developing
+    if (dev) {
+      const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer')
+
+      installExtension(REACT_DEVELOPER_TOOLS)
+        .catch(err => console.log('Error loading React DevTools: ', err))
+      win2.webContents.openDevTools()
+    }
+  })
+
+  // Emitted when the win2dow is closed.
+  win2.on('closed', function() {
+    // Dereference the win2dow object, usually you would store win2dows
+    // in an array if your app supports multi win2dows, this is the time
+    // when you should delete the corresponding element.
+    win2 = null
+  })
+}
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
+app.on('ready', createWorker)
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -105,12 +160,13 @@ app.on('activate', () => {
 })
 
 
+/*
 app.on('ready', () => {
   const { net } = require('electron')
   const request = net.request({
                     method: 'GET',
                     protocol: '',
-                    hostname: '203.237.53.82',
+                    hostname: '203.237.53.84',
                     port: 8090,
                     path: '/ping'
                   })
@@ -131,15 +187,14 @@ app.on('ready', () => {
   })
   request.end()
 })
+*/
 
 app.on('ready', () => {
   win.webContents.on('did-finish-load', () => {
-    win.webContents.send('ping', 'hello world1')
+    win.webContents.send('ping', 'main window')
   })
-})
 
-app.on('ready', () => {
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('ping', 'hello world2')
+  win2.webContents.on('did-finish-load', () => {
+    win2.webContents.send('ping', 'worker')
   })
 })

@@ -32,12 +32,33 @@ module.exports = {
     ]
   },
   target: 'electron-renderer',
+
+
+  entry: {
+    'index': './src/index.js',
+    'worker': './src/worker.js'
+  },
+
+  output: {
+    path: '/dist',
+    filename: '[name].js'
+  },
+
+
   plugins: [
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      filename: 'index.html'
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'worker.html'
+    }),
+
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development')
+      'process.env.NODE_ENV': JSON.stringify('development'),
     })
   ],
+
+
   devtool: 'cheap-source-map',
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
@@ -56,4 +77,5 @@ module.exports = {
       .on('error', spawnError => console.error(spawnError))
     }
   }
+
 }
