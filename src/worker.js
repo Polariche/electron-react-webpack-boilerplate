@@ -70,6 +70,7 @@ const detectExpressions = async () => {
     onReady();
   }
 
+
   if(typeof result !== 'undefined') {
 
     let happiness = 0, anger = 0;
@@ -98,6 +99,7 @@ let onReady = () => {
 };
 
 let onExpression = (type) => {
+  console.log(type);
   notifyRenderer('expression', {
     type: type
   });
@@ -117,9 +119,12 @@ let vid = document.createElement('video')
 
 root.id = 'root'
 vid.id = 'cam'
+vid.autoplay = true
+vid.muted = true
+vid.playsinline = true
+
 document.body.appendChild(root)
 root.appendChild(vid)
-
 
 loadNet()
 .then(_ => {
