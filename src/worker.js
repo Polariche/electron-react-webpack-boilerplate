@@ -1,3 +1,5 @@
+// credit to https://github.com/andypotato/do-not-laugh/blob/master/src/worker.js
+
 const electron = require('electron');
 
 import React from 'react'
@@ -9,132 +11,138 @@ import { ipcRenderer } from 'electron'
 
 import * as faceapi from 'face-api.js';
 
-// init detection options
-const minConfidenceFace = 0.5;
-const faceapiOptions = new faceapi.SsdMobilenetv1Options({ minConfidenceFace });
 
-// cam reference
-let cam;
+ipcRenderer.on('worker_init', (event, arg) => {
+  
+  // init detection options
+  const minConfidenceFace = 0.5;
+  const faceapiOptions = new faceapi.SsdMobilenetv1Options({ minConfidenceFace });
 
-let isRunning = true;
-let isReady = false;
+  // cam reference
+  let cam;
 
-// configure face API
-faceapi.env.monkeyPatch({
-  Canvas: HTMLCanvasElement,
-  Image: HTMLImageElement,
-  ImageData: ImageData,
-  Video: HTMLVideoElement,
-  createCanvasElement: () => document.createElement('canvas'),
-  createImageElement: () => document.createElement('img')
-});
+  let isRunning = true;
+  let isReady = false;
 
-const loadNet = async () => {
+  // configure face API
+  faceapi.env.monkeyPatch({
+    Canvas: HTMLCanvasElement,
+    Image: HTMLImageElement,
+    ImageData: ImageData,
+    Video: HTMLVideoElement,
+    createCanvasElement: () => document.createElement('canvas'),
+    createImageElement: () => document.createElement('img')
+  });
 
-  const detectionNet = faceapi.nets.ssdMobilenetv1;
-  await detectionNet.load('/data/weights');
-  await faceapi.loadFaceExpressionModel('/data/weights');
-};
+  const loadNet = async () => {
 
-const initCamera = async (width, height) => {
+    const detectionNet = faceapi.nets.ssdMobilenetv1;
+    await detectionNet.load('/data/weights');
+    await faceapi.loadFaceExpressionModel('/data/weights');
+  };
 
-  const video = document.getElementById('cam');
-  video.width = width;
-  video.height = height;
+  const initCamera = async (width, height) => {
 
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: false,
-    video: {
-      facingMode: "user",
-      width: width,
-      height: height
+    const video = document.getElementById('cam');
+    video.width = width;
+    video.height = height;
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: "user",
+        width: width,
+        height: height
+      }
+    });
+    video.srcObject = stream;
+
+    return new Promise((resolve) => {
+      video.onloadedmetadata = () => {
+        resolve(video);
+      };
+    });
+  };
+
+  const detectExpressions = async () => {
+
+    // detect expression
+    let result = await faceapi.detectSingleFace(cam, faceapiOptions)
+      .withFaceExpressions();
+
+    if(!isReady) {
+      isReady = true;
+      onReady();
     }
-  });
-  video.srcObject = stream;
 
-  return new Promise((resolve) => {
-    video.onloadedmetadata = () => {
-      resolve(video);
-    };
-  });
-};
 
-const detectExpressions = async () => {
+    if(typeof result !== 'undefined') {
 
-  // detect expression
-  let result = await faceapi.detectSingleFace(cam, faceapiOptions)
-    .withFaceExpressions();
+      let happiness = 0, anger = 0;
 
-  if(!isReady) {
-    isReady = true;
-    onReady();
+      if(result.expressions.hasOwnProperty('happy')) {
+        happiness = result.expressions.happy;
+      }
+      if(result.expressions.hasOwnProperty('angry')) {
+        anger = result.expressions.angry;
+      }
+
+      if(happiness > 0.7) {
+        onExpression('happy');
+      } else if(anger > 0.7) {
+        onExpression('angry');
+      }
+    }
+
+    if(isRunning) {
+      detectExpressions();
+    }
+  };
+
+  let onReady = () => {
+    notifyRenderer('ready', {});
+  };
+
+  let onExpression = (type) => {
+    console.log(type);
+    notifyRenderer('expression', {
+      type: type
+    });
+  };
+
+  let notifyRenderer = (command, payload) => {
+
+    // notify renderer
+    ipcRenderer.send('worker-to-index', {
+      command: command, payload: payload
+    });
+    
   }
 
 
-  if(typeof result !== 'undefined') {
+  let root = document.createElement('div')
+  let vid = document.createElement('video')
 
-    let happiness = 0, anger = 0;
+  root.id = 'root'
+  vid.id = 'cam'
+  vid.autoplay = true
+  vid.muted = true
+  vid.playsinline = true
 
-    if(result.expressions.hasOwnProperty('happy')) {
-      happiness = result.expressions.happy;
-    }
-    if(result.expressions.hasOwnProperty('angry')) {
-      anger = result.expressions.angry;
-    }
+  document.body.appendChild(root)
+  root.appendChild(vid)
 
-    if(happiness > 0.7) {
-      onExpression('happy');
-    } else if(anger > 0.7) {
-      onExpression('angry');
-    }
-  }
-
-  if(isRunning) {
+  loadNet()
+  .then(_ => {
+    console.log('Network has loaded');
+    return initCamera(640, 480);
+  })
+  .then(video => {
+    console.log('Camera was initialized');
+    cam = video;
     detectExpressions();
-  }
-};
-
-let onReady = () => {
-  notifyRenderer('ready', {});
-};
-
-let onExpression = (type) => {
-  console.log(type);
-  notifyRenderer('expression', {
-    type: type
   });
-};
-
-let notifyRenderer = (command, payload) => {
-
-  // notify renderer
-  ipcRenderer.send('window-message-from-worker', {
-    command: command, payload: payload
-  });
-}
 
 
-let root = document.createElement('div')
-let vid = document.createElement('video')
 
-root.id = 'root'
-vid.id = 'cam'
-vid.autoplay = true
-vid.muted = true
-vid.playsinline = true
-
-document.body.appendChild(root)
-root.appendChild(vid)
-
-loadNet()
-.then(_ => {
-  console.log('Network has loaded');
-  return initCamera(640, 480);
 })
-.then(video => {
-  console.log('Camera was initialized');
-  cam = video;
-  detectExpressions();
-});
-
-

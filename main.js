@@ -191,10 +191,20 @@ app.on('ready', () => {
 
 app.on('ready', () => {
   win.webContents.on('did-finish-load', () => {
-    win.webContents.send('ping', 'main window')
+    win.webContents.send('index_init')
   })
 
   win2.webContents.on('did-finish-load', () => {
-    win2.webContents.send('ping', 'worker')
+    win2.webContents.send('worker_init')
   })
 })
+
+app.on('ready', () => {
+  win.webContents.on('did-finish-load', () => {
+    win.webContents.send('ping', 'main')
+  })
+})
+
+ipcMain.on('worker-to-index', (event, arg) => {
+    win.webContents.send('from-worker', arg);
+});

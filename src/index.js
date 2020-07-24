@@ -4,18 +4,26 @@ import App from './components/App'
 import { ipcRenderer } from 'electron'
 
 
+ipcRenderer.on('index_init', (event, arg) => {
+    // Since we are using HtmlWebpackPlugin WITHOUT a template, we should create our own root node in the body element before rendering into it
+    let root = document.createElement('div')
 
-// Since we are using HtmlWebpackPlugin WITHOUT a template, we should create our own root node in the body element before rendering into it
-let root = document.createElement('div')
-
-root.id = 'root'
-document.body.appendChild(root)
+    root.id = 'root'
+    document.body.appendChild(root)
 
 
-// https://www.electronjs.org/docs/api/ipc-main
-ipcRenderer.on('ping', (event, arg) => {
-  console.log(arg) // "pong"이 출력됩니다.
+    // https://www.electronjs.org/docs/api/ipc-main
+    ipcRenderer.on('ping', (event, arg) => {
+      console.log(arg) // "pong"이 출력됩니다.
+      // Now we can render our application into it
+      render(<App content={arg} />, document.getElementById('root'))
+    })
 
-  // Now we can render our application into it
-  render(<App content={arg} />, document.getElementById('root'))
+    ipcRenderer.on('from-worker', (event, arg) => {
+      if (arg.command == "expression") {
+        render(<App content={arg.payload.type} />, document.getElementById('root'))
+      }
+      
+    })
+
 })
