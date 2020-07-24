@@ -24,6 +24,8 @@ ipcRenderer.on('worker_init', (event, arg) => {
   let isRunning = true;
   let isReady = false;
 
+  let neutral_timer = 0;
+
   // configure face API
   faceapi.env.monkeyPatch({
     Canvas: HTMLCanvasElement,
@@ -88,15 +90,24 @@ ipcRenderer.on('worker_init', (event, arg) => {
       }
 
       if(happiness > 0.7) {
+        neutral_timer = 0;
         onExpression('happy');
       } else if(anger > 0.7) {
+        neutral_timer = 0;
         onExpression('angry');
+      } else {
+        if (neutral_timer > 5) {
+          onExpression('neutral');
+        }
+        neutral_timer += 1;
       }
+
     }
 
     if(isRunning) {
-      detectExpressions();
+      setTimeout( () => {detectExpressions();}, 100);
     }
+
   };
 
   let onReady = () => {
@@ -108,6 +119,7 @@ ipcRenderer.on('worker_init', (event, arg) => {
     notifyRenderer('expression', {
       type: type
     });
+
   };
 
   let notifyRenderer = (command, payload) => {
@@ -116,7 +128,7 @@ ipcRenderer.on('worker_init', (event, arg) => {
     ipcRenderer.send('worker-to-index', {
       command: command, payload: payload
     });
-    
+
   }
 
 
@@ -140,6 +152,8 @@ ipcRenderer.on('worker_init', (event, arg) => {
   .then(video => {
     console.log('Camera was initialized');
     cam = video;
+    
+    onExpression('neutral');
     detectExpressions();
   });
 

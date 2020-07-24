@@ -1,8 +1,9 @@
 import React from 'react'
 import { render } from 'react-dom'
 import App from './components/App'
+import Face from './components/Face'
 import { ipcRenderer } from 'electron'
-
+import { Stage, Container, AppConsumer } from '@inlet/react-pixi'
 
 ipcRenderer.on('index_init', (event, arg) => {
     // Since we are using HtmlWebpackPlugin WITHOUT a template, we should create our own root node in the body element before rendering into it
@@ -20,8 +21,13 @@ ipcRenderer.on('index_init', (event, arg) => {
     })
 
     ipcRenderer.on('from-worker', (event, arg) => {
+
       if (arg.command == "expression") {
-        render(<App content={arg.payload.type} />, document.getElementById('root'))
+        render(<Stage>
+                  <Container>
+                    <AppConsumer>{app => <Face expression={arg.payload.type} />}</AppConsumer>
+                  </Container>
+                </Stage>, document.getElementById('root'))
       }
       
     })
