@@ -26,12 +26,16 @@ class Face extends React.Component {
     }))
   }
 
+  /*
   removeFace = () => {
     this.props.removeFace()
     this.setState({
       visible: false
     })
   }
+  */
+
+  
 
   render() {
     const expression_sprite = "./"+this.state.expression+".png"

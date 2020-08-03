@@ -19,6 +19,14 @@ class App extends Component {
   		this.faces.current.addFace(key);
   	}
 
+  	removeFace = (key) => {
+  		this.faces.current.removeFace(key);
+  	}
+
+  	changeExpression = (key, expression) => {
+	    this.faces.current.changeExpression(key, expression);
+	 }
+
 	render() {
 
     	return (

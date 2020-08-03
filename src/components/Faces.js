@@ -9,7 +9,8 @@ export default class Faces extends Component {
     this.state={
       mouseX: 0,
       mouseY: 0,
-      numberOfFaces: 0
+      numberOfFaces: 0,
+      faceRefs: {}
     }
   }
 
@@ -35,33 +36,54 @@ export default class Faces extends Component {
   addFace = (key) => {
     console.log("Add Face!")
 
-    this.setState(state => ({
-      ...state,
-      numberOfFaces: this.state.numberOfFaces + 1
-    }))
+    this.setState(state => {
+      let faceRefs = Object.assign({}, state.faceRefs);
+      faceRefs[key] = React.createRef();
+
+      return {
+        ...state,
+        numberOfFaces: this.state.numberOfFaces + 1,
+        faceRefs: faceRefs
+      };
+    })
     
   }
 
-  removeFace = () => {
+  removeFace = (key) => {
+    console.log("Delete Face!");
 
-    this.setState(state => ({
-      ...state,
-      numberOfFaces: this.state.numberOfFaces - 1
-    }))
+    this.setState(state => {
+      let faceRefs = Object.assign({}, state.faceRefs);
+      delete faceRefs[key];
 
+      return {
+        ...state,
+        numberOfFaces: this.state.numberOfFaces + 1,
+        faceRefs: faceRefs
+      };
+    })
+
+  }
+
+  changeExpression = (key, expression) => {
+    console.log(this.state.faceRefs)
+
+    this.state.faceRefs[key].current.changeExpression(expression);
   }
 
   render() {
 
     const { screenWidth, screenHeight } = this.props
-    const { numberOfFaces } = this.state
+    const { numberOfFaces, faceRefs } = this.state
 
-    return Array(numberOfFaces).fill().map((element, index) =>
+
+    return Object.entries(faceRefs).map((element, index) =>
       <Face
         x={Math.random() * Math.floor(screenWidth)}
         y={Math.random() * Math.floor(screenHeight)}
-        key={index}
-        removeFace={this.removeFace} />
+        key={element[0]}
+        removeFace={this.removeFace} 
+        ref={element[1]}/>
     )
 
   }

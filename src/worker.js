@@ -122,11 +122,11 @@ ipcRenderer.on('worker_init', (event, arg) => {
 
   };
 
-  let notifyRenderer = (command, payload) => {
+  let notifyRenderer = (type, payload) => {
 
     // notify renderer
     ipcRenderer.send('worker-to-index', {
-      command: command, payload: payload
+      type: type, payload: payload
     });
 
   }

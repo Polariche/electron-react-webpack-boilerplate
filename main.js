@@ -166,9 +166,11 @@ app.on('ready', () => {
   ipcMain.on('appReady', (event, arg) => {
 
     win.webContents.send('addFace', 1234);
-    win.webContents.send('addFace', 1234);
-    win.webContents.send('addFace', 1234);
-    win.webContents.send('addFace', 1234);
+    win.webContents.send('addFace', 1235);
+    win.webContents.send('addFace', 1236);
+    win.webContents.send('addFace', 1237);
+
+    win.webContents.send('removeFace', 1237);
 
     const WebSocket = require('ws');
     const ws = new WebSocket('ws://203.237.53.84:8080/echo')

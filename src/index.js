@@ -31,6 +31,17 @@ ipcRenderer.on('index_init', (event, arg) => {
     ipcRenderer.on('addFace', (event, arg) => {
       app_ref.current.addFace(arg);
     })
+    ipcRenderer.on('removeFace', (event, arg) => {
+      app_ref.current.removeFace(arg);
+    })
+
+    ipcRenderer.on('from-worker', (event, arg) => {
+
+      if (arg.type == "expression") {
+        app_ref.current.changeExpression(1234, arg.payload.data);
+      }
+      
+    })
 
     //})
 
