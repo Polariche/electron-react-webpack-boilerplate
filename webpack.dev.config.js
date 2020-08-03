@@ -16,7 +16,15 @@ module.exports = {
       },
       {
         test: /\.jsx?$/,
-        use: [{ loader: 'babel-loader' }],
+        use: [{ 
+          loader: 'babel-loader',
+          options: {
+            plugins: [
+              "@babel/plugin-proposal-class-properties"
+            ]
+          } 
+
+        }],
         include: defaultInclude
       },
       {

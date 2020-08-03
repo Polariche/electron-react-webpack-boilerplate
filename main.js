@@ -160,34 +160,42 @@ app.on('activate', () => {
 })
 
 
-/*
-app.on('ready', () => {
-  const { net } = require('electron')
-  const request = net.request({
-                    method: 'GET',
-                    protocol: '',
-                    hostname: '203.237.53.84',
-                    port: 8090,
-                    path: '/ping'
-                  })
-  request.on('response', (response) => {
-    console.log(`STATUS: ${response.statusCode}`)
-    console.log(`HEADERS: ${JSON.stringify(response.headers)}`)
-    response.on('data', (chunk) => {
-      console.log(`BODY: ${chunk}`)
 
-      // https://github.com/electron/electron/issues/3386
-      win.webContents.on('did-finish-load', () => {
-        win.webContents.send('ping', `${chunk}`)
-      })
+app.on('ready', () => {
+
+  ipcMain.on('appReady', (event, arg) => {
+
+    win.webContents.send('addFace', 1234);
+    win.webContents.send('addFace', 1234);
+    win.webContents.send('addFace', 1234);
+    win.webContents.send('addFace', 1234);
+
+    const WebSocket = require('ws');
+    const ws = new WebSocket('ws://203.237.53.84:8080/echo')
+
+    ws.on('open', () => {
+      const message = {'type': 'open', 'payload': 'hello'};
+      ws.send(JSON.stringify(message));
+
     })
-    response.on('end', () => {
-      console.log('No more data in response.')
+
+    ws.on('message', (message) => {
+    console.log(message);
+    
+      switch(message.type) {
+        case 'welcome': break;
+        case 'enter': break;
+        case 'exit': break;
+        case 'expression': break;
+      }
+      win.webContents.send('ping', `${message}`)
+
     })
-  })
-  request.end()
-})
-*/
+
+  });
+  
+});
+
 
 app.on('ready', () => {
   win.webContents.on('did-finish-load', () => {
@@ -199,12 +207,9 @@ app.on('ready', () => {
   })
 })
 
-app.on('ready', () => {
-  win.webContents.on('did-finish-load', () => {
-    win.webContents.send('ping', 'main')
-  })
-})
 
 ipcMain.on('worker-to-index', (event, arg) => {
     win.webContents.send('from-worker', arg);
 });
+
+

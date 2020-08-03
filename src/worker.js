@@ -114,10 +114,10 @@ ipcRenderer.on('worker_init', (event, arg) => {
     notifyRenderer('ready', {});
   };
 
-  let onExpression = (type) => {
-    console.log(type);
+  let onExpression = (data) => {
+    console.log(data);
     notifyRenderer('expression', {
-      type: type
+      data: data
     });
 
   };
