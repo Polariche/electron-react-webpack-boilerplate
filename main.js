@@ -163,36 +163,47 @@ app.on('activate', () => {
 
 app.on('ready', () => {
 
-  ipcMain.on('appReady', (event, arg) => {
+  ipcMain.on('app-ready', (event, arg) => {
 
-    win.webContents.send('addFace', 1234);
-    win.webContents.send('addFace', 1235);
-    win.webContents.send('addFace', 1236);
-    win.webContents.send('addFace', 1237);
+    // my identification on the server
+    let key = null;
 
-    win.webContents.send('removeFace', 1237);
+    //win.webContents.send('app-update', {type:'entry', data: ''});
+    //win.webContents.send('app-update', {type:'entry', data: 1235});
+    //win.webContents.send('app-update', {type:'entry', data: 1236});
+
+    //win.webContents.send('app-update', {type:'exit', data: 1236});
+
 
     const WebSocket = require('ws');
-    const ws = new WebSocket('ws://203.237.53.84:8080/echo')
+    const ws = new WebSocket('ws://203.237.53.84:8080')
 
     ws.on('open', () => {
-      const message = {'type': 'open', 'payload': 'hello'};
-      ws.send(JSON.stringify(message));
+      let data = {'type': 'open', 'data': 'hello'}
+      console.log(data);
+      ws.send(JSON.stringify(data));
+
+
+      ws.on('message', (message) => {
+        console.log(message);
+        win.webContents.send('app-update', message); 
+      })
+
+      ipcMain.on('set-key', (event, message) => {
+        key = message;
+      })
+
+      ipcMain.on('to-ws', (event, message) => {
+        message.data.key = key;
+        ws.send(JSON.stringify(message));
+      })
+
+      app.on('window-all-closed', () => {
+        ws.send(JSON.stringify({'type': 'close', 'data': {key: key} }));
+      })
 
     })
-
-    ws.on('message', (message) => {
-    console.log(message);
     
-      switch(message.type) {
-        case 'welcome': break;
-        case 'enter': break;
-        case 'exit': break;
-        case 'expression': break;
-      }
-      win.webContents.send('ping', `${message}`)
-
-    })
 
   });
   

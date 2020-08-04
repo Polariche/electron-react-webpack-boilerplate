@@ -13,6 +13,7 @@ ipcRenderer.on('index_init', (event, arg) => {
     const width = window.innerWidth
 
     let app_ref = React.createRef();
+    let key = '';
 
 
     root.id = 'root'
@@ -26,19 +27,39 @@ ipcRenderer.on('index_init', (event, arg) => {
 
     console.log(app_ref);
 
-    ipcRenderer.send('appReady');
+    ipcRenderer.send('app-ready');
     
-    ipcRenderer.on('addFace', (event, arg) => {
-      app_ref.current.addFace(arg);
-    })
-    ipcRenderer.on('removeFace', (event, arg) => {
-      app_ref.current.removeFace(arg);
+    ipcRenderer.on('app-update', (event, arg) => {
+      const { type, data } = arg
+
+      switch(type) {
+        case "welcome": 
+          // set my key
+          key = data.key;
+          ipcRenderer.send('set-key', key); 
+          app_ref.current.addFace(key);
+
+          // other users' keys
+          data.keys.forEach((value, index, array) => {app_ref.current.addFace(value);});
+          break;
+        case "enter": 
+          app_ref.current.addFace(data); 
+          break;
+        case "exit": 
+          app_ref.current.removeFace(data); 
+          break;
+        case "exp": 
+          app_ref.current.changeExpression(data.key, data.expression); 
+          break;
+      }
+      
     })
 
     ipcRenderer.on('from-worker', (event, arg) => {
+      const { type, data } = arg
 
-      if (arg.type == "expression") {
-        app_ref.current.changeExpression(1234, arg.payload.data);
+      if (type == "exp") {
+        app_ref.current.changeExpression(key, data.expression);
       }
       
     })
@@ -51,7 +72,7 @@ ipcRenderer.on('index_init', (event, arg) => {
       if (arg.command == "expression") {
         render(<Stage>
                   <Container>
-                    <AppConsumer>{app => <Face expression={arg.payload.data} app={app}/>}</AppConsumer>
+                    <AppConsumer>{app => <Face expression={arg.data.data} app={app}/>}</AppConsumer>
                   </Container>
                 </Stage>, document.getElementById('root'))
       }

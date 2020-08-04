@@ -15,6 +15,7 @@ class App extends Component {
     	this.faces = React.createRef();
   	}
 
+
   	addFace = (key) => {
   		this.faces.current.addFace(key);
   	}
@@ -25,7 +26,7 @@ class App extends Component {
 
   	changeExpression = (key, expression) => {
 	    this.faces.current.changeExpression(key, expression);
-	 }
+	}
 
 	render() {
 

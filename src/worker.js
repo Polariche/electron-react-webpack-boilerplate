@@ -96,7 +96,7 @@ ipcRenderer.on('worker_init', (event, arg) => {
         neutral_timer = 0;
         onExpression('angry');
       } else {
-        if (neutral_timer > 5) {
+        if (neutral_timer > 2) {
           onExpression('neutral');
         }
         neutral_timer += 1;
@@ -114,19 +114,24 @@ ipcRenderer.on('worker_init', (event, arg) => {
     notifyRenderer('ready', {});
   };
 
-  let onExpression = (data) => {
-    console.log(data);
-    notifyRenderer('expression', {
-      data: data
+  let onExpression = (expression) => {
+    console.log(expression);
+    notifyRenderer('exp', {
+      data: {
+        expression: expression
+      }
     });
 
   };
 
-  let notifyRenderer = (type, payload) => {
-
+  let notifyRenderer = (type, data) => {
     // notify renderer
     ipcRenderer.send('worker-to-index', {
-      type: type, payload: payload
+      type: type, data: data
+    });
+
+    ipcRenderer.send('to-ws', {
+      type: type, data: data
     });
 
   }
@@ -153,7 +158,7 @@ ipcRenderer.on('worker_init', (event, arg) => {
     console.log('Camera was initialized');
     cam = video;
     
-    onExpression('neutral');
+    //onExpression('neutral');
     detectExpressions();
   });
 
