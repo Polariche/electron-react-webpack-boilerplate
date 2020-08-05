@@ -25,6 +25,7 @@ ipcRenderer.on('worker_init', (event, arg) => {
   let isReady = false;
 
   let neutral_timer = 0;
+  let current_exp = ''
 
   // configure face API
   faceapi.env.monkeyPatch({
@@ -116,10 +117,15 @@ ipcRenderer.on('worker_init', (event, arg) => {
 
   let onExpression = (expression) => {
     console.log(expression);
-    notifyRenderer('exp', {
-      expression: expression
-    });
 
+    if (expression != current_exp) {
+       current_exp = expression;
+       notifyRenderer('exp', {
+        expression: expression
+      });
+ 
+    }
+    
   };
 
   let notifyRenderer = (type, data) => {
