@@ -41,16 +41,16 @@ ipcRenderer.on('index_init', (event, arg) => {
           // set my key
           key = data.key;
           ipcRenderer.send('set-key', key); 
-          app_ref.current.addFace(key);
+          //app_ref.current.addFace(key);
 
           // other users' keys
           data.keys.forEach((value, index, array) => {app_ref.current.addFace(value);});
           break;
         case "enter": 
-          app_ref.current.addFace(data); 
+          app_ref.current.addFace(data.key); 
           break;
         case "exit": 
-          app_ref.current.removeFace(data); 
+          app_ref.current.removeFace(data.key); 
           break;
         case "exp": 
           app_ref.current.changeExpression(data.key, data.expression); 
