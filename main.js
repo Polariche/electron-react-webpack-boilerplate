@@ -116,6 +116,7 @@ function createWorker() {
 
   // Don't show until we are ready and loaded
   win2.once('ready-to-show', () => {
+
     win2.show()
 
     // Open the DevTools automatically if developing
@@ -168,12 +169,6 @@ app.on('ready', () => {
     // my identification on the server
     let key = null;
 
-    //win.webContents.send('app-update', {type:'entry', data: ''});
-    //win.webContents.send('app-update', {type:'entry', data: 1235});
-    //win.webContents.send('app-update', {type:'entry', data: 1236});
-
-    //win.webContents.send('app-update', {type:'exit', data: 1236});
-
 
     const WebSocket = require('ws');
     const ws = new WebSocket('ws://203.237.53.84:8080')
@@ -186,7 +181,9 @@ app.on('ready', () => {
 
       ws.on('message', (message) => {
         console.log(message);
-        win.webContents.send('app-update', message); 
+        if (win != null) {
+          win.webContents.send('app-update', message); 
+        }
       })
 
       ipcMain.on('set-key', (event, message) => {
@@ -198,8 +195,9 @@ app.on('ready', () => {
         ws.send(JSON.stringify(message));
       })
 
-      app.on('window-all-closed', () => {
+      win.on('closed', () => {
         ws.send(JSON.stringify({'type': 'close', 'data': {key: key} }));
+        win2.close();
       })
 
     })
@@ -222,7 +220,9 @@ app.on('ready', () => {
 
 
 ipcMain.on('worker-to-index', (event, arg) => {
+  if (win != null) {
     win.webContents.send('from-worker', arg);
+  }
 });
 
 
