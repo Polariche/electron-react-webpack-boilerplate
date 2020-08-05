@@ -194,7 +194,7 @@ app.on('ready', () => {
       })
 
       ipcMain.on('to-ws', (event, message) => {
-        message.data.key = key;
+        //console.log(message);
         ws.send(JSON.stringify(message));
       })
 

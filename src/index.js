@@ -30,10 +30,14 @@ ipcRenderer.on('index_init', (event, arg) => {
     ipcRenderer.send('app-ready');
     
     ipcRenderer.on('app-update', (event, arg) => {
+
+      arg = JSON.parse(arg)
+      console.log(arg)
       const { type, data } = arg
 
       switch(type) {
         case "welcome": 
+          console.log("received welcome")
           // set my key
           key = data.key;
           ipcRenderer.send('set-key', key); 
