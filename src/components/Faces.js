@@ -65,6 +65,22 @@ export default class Faces extends Component {
 
   }
 
+  modifyFace = (key1, key2) => {
+    console.log("Delete Face!");
+
+    this.setState(state => {
+      let faceRefs = Object.assign({}, state.faceRefs);
+      faceRefs[key2] = React.createRef();
+      delete faceRefs[key1];
+
+      return {
+        ...state,
+        faceRefs: faceRefs
+      };
+    })
+
+  }
+
   changeExpression = (key, expression) => {
     console.log(this.state.faceRefs)
 

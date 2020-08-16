@@ -171,7 +171,7 @@ app.on('ready', () => {
 
 
     const WebSocket = require('ws');
-    const ws = new WebSocket('ws://203.237.53.84:8080')
+    const ws = new WebSocket('ws://210.125.84.93:8080')
 
     ws.on('open', () => {
       let data = {'type': 'open', 'data': 'hello'}

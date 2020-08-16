@@ -27,8 +27,10 @@ ipcRenderer.on('index_init', (event, arg) => {
 
     console.log(app_ref);
 
+    //my default face, also available on offline
+    app_ref.current.addFace(key);
+
     ipcRenderer.send('app-ready');
-    
     ipcRenderer.on('app-update', (event, arg) => {
 
       arg = JSON.parse(arg)
@@ -39,12 +41,15 @@ ipcRenderer.on('index_init', (event, arg) => {
         case "welcome": 
           console.log("received welcome")
           // set my key
+          let oldKey = key;
           key = data.key;
+
+          // update my old key
           ipcRenderer.send('set-key', key); 
-          //app_ref.current.addFace(key);
+          app_ref.current.modifyFace(oldKey, key);
 
           // other users' keys
-          data.keys.forEach((value, index, array) => {app_ref.current.addFace(value);});
+          data.keys.forEach((value, index, array) => { if (value != key) {app_ref.current.addFace(value);}} );
           break;
         case "enter": 
           app_ref.current.addFace(data.key); 
@@ -54,6 +59,8 @@ ipcRenderer.on('index_init', (event, arg) => {
           break;
         case "exp": 
           app_ref.current.changeExpression(data.key, data.expression); 
+          break;
+        case "disconnected":
           break;
       }
       
