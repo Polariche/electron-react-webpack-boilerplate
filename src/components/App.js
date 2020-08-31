@@ -3,6 +3,7 @@ import React, { Component, Fragment  } from 'react'
 import * as PIXI from "pixi.js"
 import { Stage, Text } from '@inlet/react-pixi'
 import Faces from "./Faces"
+import Button from './Button'
 
 class App extends Component {
 
@@ -33,19 +34,13 @@ class App extends Component {
 	}
 
 	render() {
-
     	return (
-	      	<Fragment>
-	        	<Stage
-	        	width={this.props.width}
-	        	height={this.props.height}>
+				<div id="faces">
 	          		<Faces
 	          		screenWidth={this.props.width}
 	          		screenHeight={this.props.height}
 	          		ref={this.faces}/>
-	          
-	        	</Stage>
-	      	</Fragment>
+				</div>
     	)
  	}
 

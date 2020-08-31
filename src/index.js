@@ -4,6 +4,7 @@ import App from './components/App'
 import Face from './components/Face'
 import { ipcRenderer } from 'electron'
 import { Stage, Container, AppConsumer } from '@inlet/react-pixi'
+import './assets/css/index.css'
 
 ipcRenderer.on('index_init', (event, arg) => {
     // Since we are using HtmlWebpackPlugin WITHOUT a template, we should create our own root node in the body element before rendering into it
@@ -11,6 +12,8 @@ ipcRenderer.on('index_init', (event, arg) => {
 
     const height = window.innerHeight
     const width = window.innerWidth
+    console.log('innerHeight: '+height)
+    console.log('innerWidth: '+width)
 
     let app_ref = React.createRef();
     let key = '';
@@ -18,11 +21,17 @@ ipcRenderer.on('index_init', (event, arg) => {
 
     root.id = 'root'
     document.body.appendChild(root)
+    let css = document.createElement('style')
+    css.src = 'index.css'
+    document.head.appendChild(css)
 
 
     // https://www.electronjs.org/docs/api/ipc-main
     //ipcRenderer.on('ping', (event, arg) => {
       //console.log(arg)
+    // let classroom = document.createElement('div')
+    // classroom.id = 'classroom'
+    // root.appendChild(classroom)
     render(<App width={width} height={height} ref={app_ref}/>, document.getElementById('root'))
 
     console.log(app_ref);
@@ -74,21 +83,5 @@ ipcRenderer.on('index_init', (event, arg) => {
       }
       
     })
-
-    //})
-
-    /*
-    ipcRenderer.on('from-worker', (event, arg) => {
-
-      if (arg.command == "expression") {
-        render(<Stage>
-                  <Container>
-                    <AppConsumer>{app => <Face expression={arg.data.data} app={app}/>}</AppConsumer>
-                  </Container>
-                </Stage>, document.getElementById('root'))
-      }
-      
-    })
-    */
 
 })

@@ -1,6 +1,6 @@
 //import '../assets/css/App.css'
 import React, { Component } from 'react'
-import { Sprite } from '@inlet/react-pixi'
+import { Sprite, Stage } from '@inlet/react-pixi'
 import * as PIXI from "pixi.js";
 
 const centerAnchor = new PIXI.Point(0.5, 0.5);
@@ -39,10 +39,24 @@ class Face extends React.Component {
 
   render() {
     const expression_sprite = "./"+this.state.expression+".png"
-    return (<Sprite {...this.props} 
+    // let size = this.props.screenHeight * 0.1;
+    let x = this.props.screenWidth ;
+    let y = this.props.screenHeight * 0.5;
+    console.log('Stage width * 10: '+ x);
+    console.log('Stage height * 10: '+ y);
+    return (
+      <Stage width={this.props.screenWidth * 0.2} height={this.props.screenHeight * 0.2} options={{ transparent: true }}>
+      {/* <Stage options={{ transparent: true }}> */}
+
+      <Sprite {...this.props} 
               image={expression_sprite} 
               anchor={centerAnchor} 
-              visible={this.state.visible} />)
+              width = {this.props.screenWidth * 0.2}
+              height = {this.props.screenWidth * 0.2}
+              visible={this.state.visible} 
+              />
+      </Stage>
+      )
   }
 
 }

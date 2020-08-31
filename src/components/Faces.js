@@ -1,6 +1,8 @@
 import React, { Component, Fragment } from "react"
 import * as PIXI from "pixi.js"
 import Face from "./Face"
+import { Stage } from '@inlet/react-pixi'
+
 
 export default class Faces extends Component {
 
@@ -92,14 +94,21 @@ export default class Faces extends Component {
     const { screenWidth, screenHeight } = this.props
     const { numberOfFaces, faceRefs } = this.state
 
-
     return Object.entries(faceRefs).map((element, index) =>
+    <div id="oneface">
       <Face
-        x={Math.random() * Math.floor(screenWidth)}
-        y={Math.random() * Math.floor(screenHeight)}
+        // x={Math.random() * Math.floor(screenWidth * 0.2)}
+        // y={Math.random() * Math.floor(screenHeight * 0.2)}  
+        // Set where the face will go
+        x={screenWidth*0.1}
+        y={screenHeight*0.1}
         key={element[0]}
         removeFace={this.removeFace} 
-        ref={element[1]}/>
+        ref={element[1]}
+        screenHeight = {screenHeight}
+        screenWidth = {screenWidth}
+        />
+        </div>
     )
 
   }

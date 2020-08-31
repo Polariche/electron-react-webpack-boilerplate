@@ -9,6 +9,7 @@ const url = require('url')
 // be closed automatically when the JavaScript object is garbage collected.
 let win
 let win2
+let logwin
 
 // Keep a reference for dev mode
 let dev = false
@@ -94,6 +95,7 @@ function createWorker() {
     }
   })
 
+
   // and load the index.html of the app.
   let indexPath
 
@@ -137,11 +139,70 @@ function createWorker() {
     win2 = null
   })
 }
+
+function createLoginWindow() {
+  // Create the browser window.
+  logwin = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    show: false,
+    webPreferences: {
+      nodeIntegration: true
+    }
+  })
+
+  // and load the index.html of the app.
+  let indexPath
+
+  if (dev && process.argv.indexOf('--noDevServer') === -1) {
+    indexPath = url.format({
+      protocol: 'http:',
+      host: 'localhost:8080',
+      pathname: 'login.html',
+      slashes: true
+    })
+  } else {
+    indexPath = url.format({
+      protocol: 'file:',
+      pathname: path.join(__dirname, 'dist', 'login.html'),
+      slashes: true
+    })
+  }
+
+logwin.loadURL(indexPath)
+
+  // Don't show until we are ready and loaded
+logwin.once('ready-to-show', () => {
+
+    logwin.show()
+
+    // Open the DevTools automatically if developing
+    if (dev) {
+      const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer')
+
+      installExtension(REACT_DEVELOPER_TOOLS)
+        .catch(err => console.log('Error loading React DevTools: ', err))
+      logwin.webContents.openDevTools()
+    }
+  })
+
+  // Emitted when the win2dow is closed.
+  logwin.on('closed', function() {
+    // Dereference the win2dow object, usually you would store win2dows
+    // in an array if your app supports multi win2dows, this is the time
+    // when you should delete the corresponding element.
+    logwin = null
+  })
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+// 윈도우 두 개를 생성한다
 app.on('ready', createWindow)
 app.on('ready', createWorker)
+//app.on('ready', createLoginWindow)
+
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -161,7 +222,7 @@ app.on('activate', () => {
 })
 
 
-
+// 앱이 준비가 되면 웹소켓을 통해 서버와 연결한다
 app.on('ready', () => {
 
   ipcMain.on('app-ready', (event, arg) => {
@@ -207,17 +268,32 @@ app.on('ready', () => {
   
 });
 
-
+// Web 화면이 모두 띄워졌는지 확인
 app.on('ready', () => {
+  // logwin.webContents.on('did-finish-load', () => {
+  //   logwin.webContents.send('login_init')
+  // })
   win.webContents.on('did-finish-load', () => {
+    // index_init이라는 메시지? 를 보냄. 보면 index.js에서 index_init을 들어서 작업 시작함
     win.webContents.send('index_init')
   })
 
   win2.webContents.on('did-finish-load', () => {
     win2.webContents.send('worker_init')
   })
+
 })
 
+// ipcMain.on('login-success', () => {
+//   win.webContents.on('did-finish-load', () => {
+//     // index_init이라는 메시지? 를 보냄. 보면 index.js에서 index_init을 들어서 작업 시작함
+//     win.webContents.send('index_init')
+//   })
+
+//   win2.webContents.on('did-finish-load', () => {
+//     win2.webContents.send('worker_init')
+//   })
+// })
 
 ipcMain.on('worker-to-index', (event, arg) => {
   if (win != null) {
