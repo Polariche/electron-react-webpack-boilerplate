@@ -35,12 +35,19 @@ class App extends Component {
 
 	render() {
     	return (
-				<div id="faces">
-	          		<Faces
-	          		screenWidth={this.props.width}
-	          		screenHeight={this.props.height}
-	          		ref={this.faces}/>
+				<div id="classroom">
+					<div id="classMaterial">
+					</div>
+					<div id="faces">
+	          			<Faces
+	          			screenWidth={this.props.width}
+	          			screenHeight={this.props.height}
+	          			ref={this.faces}/>
+					</div>
+					<div id="desk">
+					</div>
 				</div>
+
     	)
  	}
 

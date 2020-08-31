@@ -1,8 +1,17 @@
-div#faces{
-    background-color: white;
+body{
     width: 100%;
     height: 100%;
+    background-color: white;
+}
+div#faces{
+    background-color: white;
+    /* width: 100%; */
+    /* height: 100%; */
+    width: 1227px;
+    height: 150px;
     position: absolute;
+    left: 27px;
+    top: 585px;
 }
 div#oneface{
     position: absolute;
@@ -13,9 +22,24 @@ div#oneface{
     background-color: transparent;
 }
 
+div#classMaterial{
+    position: absolute;
+    width: 800px;
+    height: 480px;
+    left: 18px;
+    top: 68px;
+    /* background-image:url("../../../dist/classMaterial.png")  */
+    background-color: turquoise;
+}
+
+
 canvas {
-    width: 100%;
-    height: 100%;
+    /* width: 100%;
+    height: 100%; */
+    width: 150px;
+    height: 175.93px;
     display: block;
+    left: 188px;
+    top: 585px;
     align-content: center;
   }

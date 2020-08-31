@@ -38,7 +38,7 @@ class Face extends React.Component {
   
 
   render() {
-    const expression_sprite = "./"+this.state.expression+".png"
+    const expression_sprite = "./Girl1_"+this.state.expression+".png"
     // let size = this.props.screenHeight * 0.1;
     let x = this.props.screenWidth ;
     let y = this.props.screenHeight * 0.5;
@@ -51,8 +51,10 @@ class Face extends React.Component {
       <Sprite {...this.props} 
               image={expression_sprite} 
               anchor={centerAnchor} 
-              width = {this.props.screenWidth * 0.2}
-              height = {this.props.screenWidth * 0.2}
+              // width = {this.props.screenWidth * 0.2}
+              // height = {this.props.screenHeight * 0.2}
+              width = {150}
+              height={175.93}
               visible={this.state.visible} 
               />
       </Stage>
