@@ -38,6 +38,8 @@ class App extends Component {
 				<div id="classroom">
 					<div id="classMaterial">
 					</div>
+					<div id="teacherVideo">
+					</div>
 					<div id="faces">
 	          			<Faces
 	          			screenWidth={this.props.width}

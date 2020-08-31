@@ -1,6 +1,7 @@
 html, body{
     margin: 0;
-    height: 100%;
+    width: 1280px;
+    height: 853px;
     background-color: white;
 }
 div#faces{
@@ -22,9 +23,20 @@ div#oneface{
     background-color: transparent;
 }
 
+div#teacherVideo{
+    position: absolute;
+    width: 400px;
+    height: 240px;
+    left: 854px;
+    top: 75px;
+    background-image: url(../../../dist/classMaterial.png);
+    right: 26px;
+}
+
+
 div#desk{
     position: absolute;
-    width: 100%;
+    width: 1227px;
     height: 118px;
     left: 27px;
     top: 735px;
@@ -38,7 +50,7 @@ div#classMaterial{
     height: 480px;
     left: 18px;
     top: 68px;
-    background-image: url("../../../dist/happy.png") ;
+    background-image: url("../../../dist/classMaterial.png") ;
     /* background-color: turquoise; */
 }
 
